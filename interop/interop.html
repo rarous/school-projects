@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="cs" />
+<meta name="author" content="Aleš Roubíček; mailto:ales.roubicek@pbsoftware.cz" />
+<link href="../../Themes/sheets.css" rel="stylesheet" type="text/css" />
+<title>Interoperabilita SOAP - Semestrální práce z X36ALG</title>
+</head>
+<body>
+<h1>Semestrální práce</h1>
+<h2>Interoperabilita SOAP</h2>
+<p>Program se skládá ze dvou částí: webové služby a klienta. Webová služba je
+	napsaná v C#.net a poskytuje rozhrani pro proáci s databází kontaktů, která
+	je uložená na MS SQL serveru. Klient je konzolová aplikace napsaná v Javě. Využívá
+	protokolu SOAP ke komunikaci se službou.</p>
+<h2>Webová služba</h2>
+<p>XML webová služba je na URL <a
+ href="kontakt.asmx">http://rarous.aspweb.cz/skola/interop/kontakt.asmx</a> kde
+	Framework.net automaticky vygeneroval její popis. Služba poskytuje tyto metody:</p>
+<ul>
+	<li><code>Kontakt nactiKontakt(string prijmeni)</code></li>
+	<li><code>void smazKontakt(int id)</code></li>
+	<li><code>ulozKontakt(Kontakt kontakt)</code></li>
+	<li><code>Kontakt[] nactiKontakty()</code></li>
+</ul>
+<p>Ve většině případů se pracuje s třídou Kontakt, která má tyto členy:</p>
+<ul>
+	<li><code>int id</code></li>
+	<li><code>string jmeno</code></li>
+	<li><code>string prijmeni</code></li>
+	<li><code>string email</code></li>
+	<li><code>string www</code></li>
+	<li><code>int telefon</code></li>
+	<li><code>int icq</code></li>
+</ul>
+<h2>Klient</h2>
+<p>Klient k webové službě potřebuje k funkci následující knihovny:</p>
+<ul>
+	<li><a href="client/sugar.jar">sugar.jar</a></li>
+	<li><a href="client/webservices.jar">webservices.jar</a></li>
+</ul>
+<p>Balík surag.jar byl vyvinut na katedře výpočetní techniky FEL ČVUT pro studijní
+	účely. Mj. ulehčuje práci se vstupem a výstupem dat na konzolu.
+	Balík webservices.jar je součástí Macromedia JRun a obsahuje důležité součásti
+	Apache Axis pro práci s webovými službami. Tento balík umožňuje vygenerovat
+	proxy třídu v jazyce Java z WSDL (XML jazyk pro popis webových služeb).</p>
+<p>Po spuštění služby se objeví následující obrazovka:</p>
+<pre class="console">Interoperabilita SOAP
+Semestralni prace
+Client k XML webove sluzbe
+
+Menu:
+	0. konec programu
+	1. Novy kontakt
+	2. Vyhledat kontakt
+	3. Vypsat kontakty
+	4. Smazat kontakt
+_____________________________
+Vase volba:</pre>
+<ol>
+	<li><em>Nový kontakt </em>- vytvoříte nový kontakt postupným zadáváním vyžadovaných údajů.
+		Pozn. všechny údaje musejí být zadány.</li>
+	<li><em>Vyhledat kontakt </em>- budete dotázáni na Příjmení hledaného kontaktu. Pozn.
+		příjmení nemusí být zadáno celé, stačí několik počátečních písmen, ale s prvním
+		velkým. Pokud je v databázi více kontaktů se stejným příjmením, vypíše se pouze
+		jedno.</li>
+	<li><em>Vypsat kontakty</em> - vypíše všechny kontakty z databáze.</li>
+	<li><em>Smazat kontakt </em>- smaže kontakt podle id kontaktu - první číslo ve výpisu.</li>
+</ol>
+</body>
+</html>

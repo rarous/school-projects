@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="cs" />
+<meta name="author" content="Aleš Roubíček; mailto:ales.roubicek@pbsoftware.cz" />
+<link href="../../Themes/sheets.css" rel="stylesheet" type="text/css" />
+<title>Semestrální práce z X36DBS a X36WWW - Program Projektor</title>
+</head>
+<body>
+	<h1>Program Projektor - Semestrální práce z X36DBS a X36WWW</h1>
+	<h2>Autor</h2>
+	<p>Aleš Roubíček [<a href="mailto:roubia1@fel.cvut.cz" title="E-mail autora">mailto:roubia1@fel.cvut.cz</a>]</p>
+	<h2>Prohlášení</h2>
+	<p>Prohlašuji, že jsem semestrální práci vypracoval samostaně. Při jejím vytváření jsem
+		čerpal z následujících zdrojů:</p>
+	<ul>
+		<li>Skriptum: Databázové systémy </li>
+		<li>Poznámky z přednášek X36DBS</li>
+		<li>Poznámky z přednášek a cvičení X36WWW</li>
+		<li>Dokumentace MSDN <a href="http://msdn.microsoft.com/">http://msdn.microsoft.com/</a>
+		</li>
+	</ul>
+	<h2 id="zadani">Zadání</h2>
+	<p>Program projektor slouží k vedení týmových projektů a komunikaci mezi autory a případně
+		se zákazníkem (je to program typu <em>BugZilla,</em> ale trochu jinak orientovaný).
+		Program Projektor je postavený na databázi MS SQL Server 2005 a částečně i na XML.
+		Program bude mýt tyto uživatelské role:</p>
+	<ul>
+		<li><strong>Administátor</strong> Má právo přidávat nové uživatele do systému a níže
+			popsané pro další </li>
+		<li><strong>Správce projektů</strong> Vytváří nové projekty a přiřazuje do nich jednotlivé
+			uživatele </li>
+		<li><strong>Programátor</strong> Přidává do přiděleného projektu soubory, návrhy. </li>
+		<li><strong>Zákazník</strong> Může si prohlížet stav projektu. </li>
+	</ul>
+	<p>Projekt se skládá z příspěvků v podobě požadavků na doplnění nebo changelogů. Každý
+		příspěvek může mít připojeno několik souborů, které jsou uloženy ve filesystému,
+		a dále může být přednostně směrován některému z uživatelů. Projekt se skládá z několika
+		fází, které se postupně budou uzavírat, tak může zákazník sledovat stav projektu.
+		Vzhledem k tomu, že projektor je zaměřen převážně na webové projekty, bude mít zákazník
+		možnost si, ve fázi vývoje a testování, prohlédnou stávající stav aplikace na testovacím
+		serveru.</p>
+	<h2>Dokumentace</h2>
+	<ol>
+		<li><a href="uzivatel.htm">Uživatelský manuál</a></li>
+		<li><a href="programator.htm">Programátorský manuál</a></li>
+		<li><a href="db.htm">Databáze</a></li>
+	</ol>
+</body>
+</html>

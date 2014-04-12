@@ -1,0 +1,518 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="cs" />
+<meta name="author" content="Aleš Roubíček; mailto:ales.roubicek@pbsoftware.cz" />
+<link href="../../Themes/sheets.css" rel="stylesheet" type="text/css" />
+<title>X36LOB Aleš Roubíček Semestrální práce</title>
+</head>
+<body>
+<h1>X36LOB – Semestrální práce</h1>
+<h2>Autor</h2>
+<p>Aleš Roubíček [<A title="E-mail autora" href="mailto:roubia1@fel.cvut.cz" >mailto:roubia1@fel.cvut.cz</A>]</p>
+<p>cvičení: <em>čtvrtek 16:15</em></p>
+<p>cvičící: <em>Ing. Pavel Kubalík</em></p>
+<p>Datum poslední aktualizace: <em>9.&nbsp;1.&nbsp;2005</em></p>
+<h2>Zadání</h2>
+<p>I. Pomocí synchronního sekvenčního obvodu realizujte konečný automat se dvěma
+	vstupy a, b a jedním výstupem z, zadaný následující tabulkou přechodů a tabulkou
+	výstupů. Minimalizujte počet vnitřních stavů a použijte vhodné zakódování
+	vnitřních stavů. Výsledné schéma implementujte v Xilinx ISE a nahrajte do
+	přípravku XCRP. Vstupy ovládejte přepínači, výstup a všechny vnitřní proměnné
+	vyveďte na LED diody. Pro hodinový signál a signál reset (použijte klopné obvody
+	s asynchronním nulováním) použijte tlačítka. Správnost návrhu ověřte na přípravku
+	podle tabulky přechodů a výstupů.</p>
+<pre>  
+    \ba| tabulka přechodů          tabulka výstupů
+   Qi\ | 00   01   10               00   01   10
+  --------------------             --------------
+     Q0| Q8   Q14  Q1                0    0    0   
+     Q1| Q5   Q3   Q0                1    1    0   
+     Q2| Q13  Q6   Q1                1    0    0   
+</pre>
+<pre>     Q3| Q11  Q0   Q13               1    1    1   
+     Q4| Q13  Q11  Q12               1    0    0   
+     Q5| Q13  Q6   Q7                1    0    0   
+     Q6| Q10  Q5   Q1                1    1    0   
+     Q7| Q5   Q3   Q13               1    1    0   
+     Q8| Q9   Q4   Q3                0    1    0   
+     Q9| Q3   Q5   Q7                1    1    0   
+    Q10| Q6   Q13  Q0                1    1    1   
+    Q11| Q3   Q2   Q12               1    1    0   
+    Q12| Q5   Q10  Q13               1    1    0   
+    Q13| Q14  Q8   Q7                0    0    0   
+    Q14| Q11  Q4   Q10               0    1    0   
+
+  Použijte klopné obvody typu D(FDC).
+</pre>
+<ol>
+	<li>Použijte buď NAND nebo NOR hradla. 
+  
+	<li>Vnější vstupy máte k dispozici pouze v přímé formě. 
+  
+	<li>Zpoždění obvodů pro hradla i pro klopné obvody naleznete v přednáškách.</li>
+</ol>
+<p>II. Stanovte maximální možnou hodinovou frekvenci za předpokladů: Vstupní
+	stavy obvodu se mění pouze v intervalu &lt;T,&nbsp;T&nbsp;+&nbsp;3&nbsp;ns&gt;,
+	kde T jsou okamžiky příchodu hrany hodinových pulzů. Správný výstupní stav musí
+	trvat po dobu nejméně 3 ns.</p>
+<h2>Vypracování</h2>
+<h3>Minimalizace vnitřních stavů</h3>
+<table class="fleft">
+	<caption>
+	původní tabulka vnitřních stavů
+	</caption>
+	<colgroup>
+	<col class="rborder" >
+	</colgroup>
+	<tr class="bborder">
+		<td>&nbsp;</td>
+		<td>00</td>
+		<td>01</td>
+		<td>10</td>
+	</tr>
+	<tr>
+		<td>0</td>
+		<td>8</td>
+		<td>14</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>5</td>
+		<td>3</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>13</td>
+		<td>6</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>11</td>
+		<td>0</td>
+		<td>13</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>13</td>
+		<td>11</td>
+		<td>12</td>
+	</tr>
+	<tr>
+		<td>5</td>
+		<td>13</td>
+		<td>6</td>
+		<td>7</td>
+	</tr>
+	<tr>
+		<td>6</td>
+		<td>10</td>
+		<td>5</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>7</td>
+		<td>5</td>
+		<td>3</td>
+		<td>13</td>
+	</tr>
+	<tr>
+		<td>8</td>
+		<td>9</td>
+		<td>4</td>
+		<td>3</td>
+	</tr>
+	<tr>
+		<td>9</td>
+		<td>3</td>
+		<td>5</td>
+		<td>7</td>
+	</tr>
+	<tr>
+		<td>10</td>
+		<td>6</td>
+		<td>13</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>11</td>
+		<td>3</td>
+		<td>2</td>
+		<td>12</td>
+	</tr>
+	<tr>
+		<td>12</td>
+		<td>5</td>
+		<td>10</td>
+		<td>13</td>
+	</tr>
+	<tr>
+		<td>13</td>
+		<td>14</td>
+		<td>8</td>
+		<td>7</td>
+	</tr>
+	<tr>
+		<td>14</td>
+		<td>11</td>
+		<td>4</td>
+		<td>10</td>
+	</tr>
+</table>
+<table class="fleft">
+<caption>1. krok<br 
+  >minimalizace</caption>
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>00</td>
+		<td>01</td>
+		<td>10</td>
+	</tr>
+	<tr>
+		<td rowspan="2">a</td>
+		<td>0</td>
+		<td>8e</td>
+		<td>14e</td>
+		<td>1c</td>
+	</tr>
+	<tr>
+		<td>13</td>
+		<td>14e</td>
+		<td>8e</td>
+		<td>7c</td>
+	</tr>
+	<tr>
+		<td rowspan="2">b</td>
+		<td>3</td>
+		<td>11c</td>
+		<td>0a</td>
+		<td>13a</td>
+	</tr>
+	<tr>
+		<td>10</td>
+		<td>6c</td>
+		<td>13a</td>
+		<td>0a</td>
+	</tr>
+	<tr>
+		<td rowspan="6">c</td>
+		<td>1</td>
+		<td>5d</td>
+		<td>3b</td>
+		<td>0a</td>
+	</tr>
+	<tr>
+		<td>6</td>
+		<td>10b</td>
+		<td>5d</td>
+		<td>1c</td>
+	</tr>
+	<tr>
+		<td>7</td>
+		<td>5d</td>
+		<td>3b</td>
+		<td>13a</td>
+	</tr>
+	<tr>
+		<td>9</td>
+		<td>3b</td>
+		<td>5d</td>
+		<td>7c</td>
+	</tr>
+	<tr>
+		<td>11</td>
+		<td>3b</td>
+		<td>2d</td>
+		<td>12c</td>
+	</tr>
+	<tr>
+		<td>12</td>
+		<td>5d</td>
+		<td>10b</td>
+		<td>13a</td>
+	</tr>
+	<tr>
+		<td rowspan="3">d</td>
+		<td>2</td>
+		<td>13a</td>
+		<td>6c</td>
+		<td>1c</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>13a</td>
+		<td>11c</td>
+		<td>12c</td>
+	</tr>
+	<tr>
+		<td>5</td>
+		<td>13a</td>
+		<td>6c</td>
+		<td>7c</td>
+	</tr>
+	<tr>
+		<td rowspan="2">e</td>
+		<td>8</td>
+		<td>9c</td>
+		<td>4d</td>
+		<td>3b</td>
+	</tr>
+	<tr>
+		<td>14</td>
+		<td>11c</td>
+		<td>4d</td>
+		<td>10b</td>
+	</tr>
+</table>
+<table class="fleft">
+<caption>2. krok<br 
+  >minimalizace</caption>
+<colgroup>
+<col >
+<col class="rborder" >
+</colgroup>
+	<tr class="bborder">
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>00</td>
+		<td>01</td>
+		<td>10</td>
+	</tr>
+	<tr>
+		<td rowspan="2">a</td>
+		<td>0</td>
+		<td>8e</td>
+		<td>14e</td>
+		<td>1c</td>
+	</tr>
+	<tr class="bborder">
+		<td>13</td>
+		<td>14e</td>
+		<td>8e</td>
+		<td>7c</td>
+	</tr>
+	<tr>
+		<td rowspan="2">b</td>
+		<td>3</td>
+		<td>11f</td>
+		<td>0a</td>
+		<td>13a</td>
+	</tr>
+	<tr class="bborder">
+		<td>10</td>
+		<td>6f</td>
+		<td>13a</td>
+		<td>0a</td>
+	</tr>
+	<tr>
+		<td rowspan="3">c</td>
+		<td>1</td>
+		<td>5d</td>
+		<td>3b</td>
+		<td>0a</td>
+	</tr>
+	<tr>
+		<td>7</td>
+		<td>5d</td>
+		<td>3b</td>
+		<td>13a</td>
+	</tr>
+	<tr class="bborder">
+		<td>12</td>
+		<td>5d</td>
+		<td>10b</td>
+		<td>13a</td>
+	</tr>
+	<tr>
+		<td rowspan="3">d</td>
+		<td>2</td>
+		<td>13a</td>
+		<td>6f</td>
+		<td>1c</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>13a</td>
+		<td>11f</td>
+		<td>12c</td>
+	</tr>
+	<tr class="bborder">
+		<td>5</td>
+		<td>13a</td>
+		<td>6f</td>
+		<td>7c</td>
+	</tr>
+	<tr>
+		<td rowspan="2">e</td>
+		<td>8</td>
+		<td>9f</td>
+		<td>4d</td>
+		<td>3b</td>
+	</tr>
+	<tr class="bborder">
+		<td>14</td>
+		<td>11f</td>
+		<td>4d</td>
+		<td>10b</td>
+	</tr>
+	<tr>
+		<td rowspan="3">f</td>
+		<td>6</td>
+		<td>10b</td>
+		<td>5d</td>
+		<td>1c</td>
+	</tr>
+	<tr>
+		<td>9</td>
+		<td>3b</td>
+		<td>5d</td>
+		<td>7c</td>
+	</tr>
+	<tr>
+		<td>11</td>
+		<td>3b</td>
+		<td>2d</td>
+		<td>12c</td>
+	</tr>
+</table>
+<table class="fleft">
+	<caption>
+	výsledná tabulka vnitřních stavů a výstupů
+	</caption>
+	<tr>
+		<td>&nbsp;</td>
+		<td>00</td>
+		<td>01</td>
+		<td>10</td>
+		<td>00</td>
+		<td>01</td>
+		<td>10</td>
+	</tr>
+	<tr>
+		<td>A</td>
+		<td>E</td>
+		<td>E</td>
+		<td>C</td>
+		<td>0</td>
+		<td>0</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>B</td>
+		<td>F</td>
+		<td>A</td>
+		<td>A</td>
+		<td>1</td>
+		<td>1</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>C</td>
+		<td>D</td>
+		<td>B</td>
+		<td>A</td>
+		<td>1</td>
+		<td>1</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>D</td>
+		<td>A</td>
+		<td>F</td>
+		<td>C</td>
+		<td>1</td>
+		<td>0</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>E</td>
+		<td>F</td>
+		<td>D</td>
+		<td>B</td>
+		<td>0</td>
+		<td>1</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>F</td>
+		<td>B</td>
+		<td>D</td>
+		<td>C</td>
+		<td>1</td>
+		<td>1</td>
+		<td>0</td>
+	</tr>
+</table>
+<table class="fleft" id=TABLE1>
+	<caption>tabulka zakódovaných stavů</caption>
+	<tr>
+		<td>&nbsp;</td>
+		<td>00</td>
+		<td>01</td>
+		<td>10</td>
+		<td>00</td>
+		<td>01</td>
+		<td>10</td>
+	</tr>
+	<tr>
+		<td>000</td>
+		<td>110</td>
+		<td>110</td>
+		<td>011</td>
+		<td>0</td>
+		<td>0</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>001</td>
+		<td>100</td>
+		<td>000</td>
+		<td>000</td>
+		<td>1</td>
+		<td>1</td>
+		<td>1</td>
+	</tr>
+	<tr>
+		<td>011</td>
+		<td>010</td>
+		<td>001</td>
+		<td>000</td>
+		<td>1</td>
+		<td>1</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>010</td>
+		<td>000</td>
+		<td>100</td>
+		<td>011</td>
+		<td>1</td>
+		<td>0</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>110</td>
+		<td>100</td>
+		<td>010</td>
+		<td>001</td>
+		<td>0</td>
+		<td>1</td>
+		<td>0</td>
+	</tr>
+	<tr>
+		<td>100</td>
+		<td>001</td>
+		<td>010</td>
+		<td>011</td>
+		<td>1</td>
+		<td>1</td>
+		<td>0</td>
+	</tr>
+</table>
+</body>
+</html>

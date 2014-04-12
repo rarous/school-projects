@@ -1,0 +1,712 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="cs" />
+<meta name="author" content="Aleš Roubíček; mailto:ales.roubicek@pbsoftware.cz" />
+<link href="../../Themes/sheets.css" rel="stylesheet" type="text/css" />
+<title>X36DBS - Semestrální práce - Program Projektor</title>
+</head>
+<body>
+<h1>Program Projektor - Databázová část</h1>
+<h2>Vypracování</h2>
+<h3>Uživatelské role</h3>
+<p>viz. <a href="index.htm#zadani">zadání</a></p>
+<h3>Typycké operace</h3>
+<p>Zákazník si u nás objedná aplikaci. Pokud jde o nového zákazníka, administrátor
+	zařadí zákazníka do databáze a vytvoří mu uživatelské konto. Založí se nový
+	projekt pro zákazníka. Vloží se nový příspěvek s prvotním zadáním od zákazníka
+	a je přidělen některému z programátorů, aby zpracoval studii a konzultoval
+	ji se zákazníkem. Konzultace mohou být realizovány buď osobně nebo prostřednictvím
+	projektoru - je vhodné zařadit výsledek ústní kozultace do projektoru jako
+	příspěvek, aby byl později přehled o vývoji aplikace. </p>
+<p>Projektor na pozadí
+		generuje RSS zdroje s aktuálními projekty a s aktuálními příspěvky pro
+	jednotlivé programátory. RSS zdroj si programátoři mohou vybírat pomocí Start
+	page v novém Visual Studiu 2005, tak budou mít neustále přehled o vývoji aplikace
+		přímo ve vývojovém nástroji.</p>
+<p>Vefázi vývoje posílají programátoři changelogy s přiloženými soubory, nebo
+	požadavky jiným programátorům.  Čtení příspěvků a stahování souborů je prozatím
+	možné poze z webové aplikace, v budoucnu se chystá rozšíření o webovou službu,
+	která umožní vytvoření tlustého klienta nebo plug-inů do Visual Studia.</p>
+<p>V bodech:  </p>
+<ul>
+	<li>vytváření uživatelů</li>
+	<li>zakládání projektů</li>
+	<li>přidávání příspěvků</li>
+	<li>ukládání souborů</li>
+	<li>čtení příspěvků a prohlížení souborů</li>
+	<li>přihlašování užvatelů</li>
+	<li>směrování příspěvku</li>
+</ul>
+<h3>ER Model</h3>
+<p><img src="model.png" alt="ER Model databáze" /></p>
+<p><a href="model.xml" title="Zdrojový Xml soubor">ER Model databáze</a> [XML
+	- CASE 2 Studio]</p>
+<h3>Zakládací SQL script databáze</h3>
+<p>V komentářích jsou změny oproti kodu z ER Modeláře </p>
+<pre lang="sql">
+/*
+Created		12.11.2004
+Modified		11.1.2005
+Project		Progran Projektor			
+Company		PB software
+Author		Aleš Roubíček
+Version		0.5
+Database		MS SQL 2000 
+*/
+Create table [Projekt]
+(
+	[id_projektu] Integer Identity(1,1) NOT NULL, UNIQUE ([id_projektu]),
+	[id_uzivatele] Integer NOT NULL,
+	[nazev] Nvarchar(255) NOT NULL,
+	[zadavatel] Nvarchar(255) NOT NULL,
+	[datum_zalozeni] Datetime NOT NULL,
+	[faze] Integer NOT NULL,
+	[test_uri] Nvarchar(255) NULL,
+	[uri] Nvarchar(255) NULL,
+	[poznamka] Ntext NULL,
+	[aktivni] Bit NOT NULL,
+Primary Key ([id_projektu])
+) 
+go
+
+Create table [Prispevek]
+(
+	[id_prispevku] Integer Identity(1,1) NOT NULL, UNIQUE ([id_prispevku]),
+	[id_projektu] Integer NOT NULL,
+	[zprava] Ntext NOT NULL,
+	[datum_vlozeni] Datetime NOT NULL,
+	[datum_upravy] Datetime NOT NULL,
+	[id_uzivatele] Integer NOT NULL,
+Primary Key ([id_prispevku],[id_projektu])
+) 
+go
+
+Create table [Soubor]
+(
+	[id_souboru] Integer Identity(1,1) NOT NULL, UNIQUE ([id_souboru]),
+	[id_prispevku] Integer NOT NULL,
+	[id_projektu] Integer NOT NULL,
+	[nazev] Nvarchar(255) NOT NULL,
+	[cesta] Nvarchar(255) NOT NULL,
+Primary Key ([id_souboru],[id_prispevku],[id_projektu])
+) 
+go
+
+Create table [Admin]
+(
+	[id_uzivatele] Integer NOT NULL,
+Primary Key ([id_uzivatele])
+) 
+go
+
+Create table [Spravce_projektu]
+(
+	[id_uzivatele] Integer NOT NULL,
+Primary Key ([id_uzivatele])
+) 
+go
+
+Create table [Programator]
+(
+	[id_uzivatele] Integer NOT NULL,
+	[programovaci_jazyky] Nvarchar(255) NULL,
+	[funkce_v_tymu] Nvarchar(255) NULL,
+Primary Key ([id_uzivatele])
+) 
+go
+
+Create table [Zakaznik]
+(
+	[firma] Nvarchar(255) NULL,
+	[ic] Nvarchar(30) NULL,
+	[dic] Nvarchar(30) NULL, /* Změněn typ z Integer*/
+	[bankovni_spojeni] Nvarchar(100) NULL,
+	[id_uzivatele] Integer NOT NULL,
+Primary Key ([id_uzivatele])
+) 
+go
+
+Create table [Uzivatel]
+(
+	[id_uzivatele] Integer Identity(1,1) NOT NULL, UNIQUE ([id_uzivatele]),
+	[jmeno] Nvarchar(255) NOT NULL,
+	[prijmeni] Nvarchar(255) NOT NULL,
+	[ulice] Nvarchar(255) NULL,
+	[email] Nvarchar(255) NOT NULL,
+	[msn] Bit NOT NULL,
+	[telefon] Nvarchar(13) NULL,
+	[icq] Nvarchar(15) NULL,
+	[login] Nvarchar(20) NULL, /* Změněn rozsah z 8O */
+	[password] Nvarchar(30) NULL, /* Změněn typ z Ntext */
+Primary Key ([id_uzivatele])
+) 
+go
+
+Create table [Projekty_zakaznika]
+(
+	[id_uzivatele] Integer NOT NULL,
+	[id_projektu] Integer NOT NULL,
+Primary Key ([id_uzivatele],[id_projektu])
+) 
+go
+
+Create table [Smerovane_prispevky]
+(
+	[id_prispevku] Integer NOT NULL,
+	[id_projektu] Integer NOT NULL,
+	[id_uzivatele] Integer NOT NULL,
+	[precetl] Bit NULL,
+Primary Key ([id_prispevku],[id_projektu],[id_uzivatele])
+) 
+go
+</pre>
+<h3>Uložené procedury pro aplikační vrstvu</h3>
+<p>Uložené procedury jsou volány komponentami v Assembly PBSoftware.Projektor.dll </p>
+<pre lang="sql">
+CREATE PROCEDURE spPrispevekNacti
+(
+  @id int,
+  @projekt int OUTPUT,
+  @zprava ntext OUTPUT,
+  @vytvoreno datetime OUTPUT,
+  @upraveno datetime OUTPUT,
+  @uzivatel int OUTPUT
+)
+AS
+SELECT 
+  @projekt = id_projektu,
+  @zprava = zprava,
+  @vytvoreno = datum_vlozeni,
+  @upraveno = datum_upravy,
+  @uzivatel = id_uzivatele
+FROM
+  Prispevek
+WHERE
+  id_prispevku = @id
+RETURN
+
+
+CREATE PROCEDURE spPrispevekUloz
+(
+  @id int,
+  @projekt int,
+  @zprava ntext,
+  @uzivatel int
+)
+AS
+SET NOCOUNT ON
+IF (@id &gt; 0) BEGIN
+UPDATE
+  Prispevek
+SET
+  id_projektu = @projekt,
+  zprava = @zprava,
+  id_uzivatele = @uzivatel,
+  datum_upravy = GETDATE()
+WHERE
+  id_prispevku = @id
+END ELSE BEGIN
+INSERT INTO Prispevek
+(
+  id_projektu,
+  zprava, 
+  id_uzivatele, 
+  datum_upravy, 
+  datum_vlozeni
+)
+VALUES
+(
+  @projekt, 
+  @zprava, 
+  @uzivatel, 
+  GETDATE(), 
+  GETDATE()
+)
+SELECT Cast(@@IDENTITY as int)
+END
+RETURN
+
+CREATE PROCEDURE spPrispevkyProjektuNacti
+(
+  @id int
+)
+AS
+SELECT
+  id_prispevku
+FROM
+  Prispevek
+WHERE
+  id_projektu = @id
+RETURN
+
+CREATE PROCEDURE spPrispevkyProjektuNactiModul
+(
+  @id int
+)
+AS
+SELECT
+  Prispevek.id_prispevku,
+  datum_vlozeni,
+  jmeno + ' ' + prijmeni AS uzivatel,
+  COUNT(id_souboru) AS pocet_souboru
+FROM
+  Prispevek
+INNER JOIN
+  Uzivatel
+ON
+  (Prispevek.id_uzivatele = Uzivatel.id_uzivatele)
+INNER JOIN
+  Soubor
+ON
+  (Prispevek.id_prispevku = Soubor.id_prispevku)
+WHERE
+  Prispevek.id_projektu = @id
+GROUP BY 
+  Prispevek.id_prispevku,
+  Prispevek.datum_vlozeni,
+  Uzivatel.jmeno,
+  Uzivatel.prijmeni
+ORDER BY
+  datum_vlozeni DESC 
+RETURN
+
+CREATE PROCEDURE spProjektNacti
+(
+  @id int,
+  @nazev nvarchar(255) OUTPUT,
+  @zakaznik int OUTPUT,
+  @faze int OUTPUT,
+  @uri nvarchar(255) OUTPUT,
+  @test_uri nvarchar(255) OUTPUT,
+  @poznamka ntext OUTPUT,
+  @aktivni bit OUTPUT,
+  @uzivatel int OUTPUT,             
+  @datum datetime OUTPUT
+)
+AS
+SELECT
+  @nazev = nazev,
+  @zakaznik = Projekty_zakaznika.id_uzivatele,
+  @faze = faze,
+  @uri = uri,
+  @test_uri = test_uri,
+  @poznamka = poznamka,
+  @aktivni = aktivni,
+  @uzivatel = Projekt.id_uzivatele,
+  @datum = datum_zalozeni
+FROM
+  Projekt
+INNER JOIN
+  Projekty_zakaznika
+ON
+  (Projekt.id_projektu = Projekty_zakaznika.id_projektu)
+WHERE
+  Projekt.id_projektu = @id                                 
+RETURN 
+
+CREATE PROCEDURE spProjektUloz
+(
+  @id int,
+  @nazev nvarchar(255),
+  @zakaznik int,
+  @faze int = 0,
+  @uri nvarchar(255) = '',
+  @test_uri nvarchar(255) = '',
+  @poznamka ntext,
+  @aktivni bit = 0,
+  @uzivatel int
+)
+AS
+SET NOCOUNT ON
+IF (@id &gt; 0) BEGIN
+UPDATE
+  Projekt
+SET
+  nazev = @nazev,
+  faze = @faze,
+  uri = @uri,
+  test_uri = @test_uri,
+  poznamka = @poznamka,
+  aktivni = @aktivni
+WHERE
+  id_projektu = @id
+END ELSE BEGIN
+INSERT INTO Projekt
+(
+  nazev,
+  faze,
+  poznamka,
+  aktivni,
+  id_uzivatele,
+  datum_zalozeni 
+)
+VALUES
+(
+  @nazev,
+  1,
+  @poznamka,
+  @aktivni,
+  @uzivatel,
+  GETDATE()
+)
+SET @id = Cast(@@Identity as int)
+INSERT INTO Projekty_zakaznika
+(
+  id_projektu,
+  id_uzivatele
+)
+VALUES
+(
+  @id,
+  @zakaznik
+)  
+SELECT @id /* vraci id noveho projektu */
+END
+RETURN 
+
+CREATE PROCEDURE spProjektyNacti
+AS
+SELECT
+  Projekt.id_projektu,
+  nazev,
+  firma AS zakaznik,
+  faze,
+  Count(Prispevek.id_prispevku) AS pocet_prispevku,
+  Prispevek.datum_upravy AS posledni_zmena
+FROM Projekt
+INNER JOIN 
+  Prispevek
+ON
+  (Projekt.id_projektu = Prispevek.id_projektu)
+INNER JOIN
+  Projekty_zakaznika
+ON
+  (Projekt.id_projektu = Projekty_zakaznika.id_projektu)
+INNER JOIN
+  Zakaznik
+ON
+  (Projekty_zakaznika.id_uzivatele = Zakaznik.id_uzivatele)
+WHERE
+  aktivni = 1
+GROUP BY
+  Projekt.id_projektu,
+  nazev, 
+  faze, 
+  Zakaznik.firma, 
+  Prispevek.datum_upravy 
+RETURN 
+
+CREATE PROCEDURE spProjektyZakaznikaNacti
+(
+  @zakaznik int
+)
+AS
+SELECT
+  id_projektu,
+  nazev,
+  firma AS zakaznik,
+  faze,
+  Count(Prispevek.id_prispevku) AS pocet_prispevku,
+  Prispevek.datum_upravy AS posledni_zmena
+FROM Projekt
+INNER JOIN
+  Prispevek
+ON
+  (Projekt.id_projektu = Prispevek.id_projektu)
+INNER JOIN
+  ProjektyZakaznika
+ON
+  (Projekt.id_projektu = ProjektyZakaznika.id_projektu)
+INNER JOIN
+  Zakaznik
+ON
+  (ProjektyZakaznika.id_uzivatele = Zakaznik.id_uzivatele)
+WHERE
+  aktivni = 1 AND ProjektyZakaznika.id_uzivatele = @zakaznik
+GROUP BY 
+  id_projektu 
+RETURN 
+
+CREATE PROCEDURE spSouborNacti
+(
+  @id int,
+  @projekt int OUTPUT,
+  @prispevek int OUTPUT,
+  @nazev nvarchar(255) OUTPUT,
+  @cesta nvarchar(255) OUTPUT
+)
+AS
+SELECT
+  @projekt = id_projektu,
+  @prispevek = id_prispevku,
+  @nazev = nazev,
+  @cesta = cesta
+FROM
+  Soubor
+WHERE
+  id_souboru = @id
+RETURN 
+
+CREATE PROCEDURE spSouborUloz
+(
+  @id int = 0,
+  @projekt int,
+  @prispevek int,
+  @nazev nvarchar(255),
+  @cesta nvarchar(255)
+)
+AS
+SET NOCOUNT ON
+IF (@id &gt; 0) BEGIN
+UPDATE
+  Soubor
+SET
+  nazev = @nazev,
+  cesta = @cesta
+WHERE
+  id_souboru = @id
+END ELSE BEGIN
+INSERT INTO Soubor
+(
+  id_projektu, 
+  id_prispevku, 
+  nazev, 
+  cesta
+)
+VALUES
+(
+  @projekt, 
+  @prispevek, 
+  @nazev, 
+  @cesta
+)
+SELECT Cast(@@IDENTITY as int)   
+END
+RETURN 
+
+CREATE PROCEDURE spSouboryPrispevkuNacti
+(
+  @id int
+)
+AS
+SELECT
+  id_souboru
+FROM
+  Soubor
+WHERE
+  id_prispevku = @id
+RETURN 
+
+CREATE PROCEDURE spUzivateleNactiModul
+AS
+SELECT
+  id_uzivatele,
+  jmeno,
+  prijmeni,
+  email,
+  icq
+FROM
+  Uzivatel  
+RETURN 
+
+CREATE PROCEDURE spUzivateleNactiVyber
+AS
+SELECT
+  id_uzivatele AS id,
+  jmeno + ' ' + prijmeni AS uzivatel
+FROM
+  Uzivatel
+WHERE
+  id_uzivatele NOT IN (SELECT id_uzivatele FROM Zakaznik)
+  AND id_uzivatele NOT IN (SELECT id_uzivatele FROM Admin)
+  AND id_uzivatele NOT IN (SELECT id_uzivatele FROM Spravce_projektu)
+  AND id_uzivatele NOT IN (SELECT id_uzivatele FROM Programator)
+RETURN 
+
+CREATE PROCEDURE spUzivatelNacti
+(
+  @id int,
+  @jmeno NVarChar(255) OUTPUT,
+  @prijmeni NVarChar(255) OUTPUT,
+  @ulice NVarChar(255) OUTPUT,
+  @email NVarChar(255) OUTPUT,
+  @msn Bit OUTPUT,
+  @telefon NVarChar(13) OUTPUT,
+  @icq NVarChar(15) OUTPUT,
+  @login nvarchar(20) OUTPUT,
+  @heslo nvarchar(30) OUTPUT
+)
+AS
+SELECT
+  @jmeno = jmeno,
+  @prijmeni = prijmeni,
+  @ulice = ulice,
+  @email = email,
+  @msn = msn,
+  @telefon = telefon,
+  @icq = icq,
+  @login = login,
+  @heslo = password
+FROM
+  Uzivatel
+WHERE
+  id_uzivatele = @id
+RETURN 
+
+CREATE PROCEDURE spUzivatelPrihlaseni
+(
+  @login nvarchar(20),
+  @pass nvarchar(30),
+  @id int OUTPUT
+)
+AS
+SELECT
+  @id = id_uzivatele
+FROM
+  Uzivatel
+WHERE
+  login = @login AND password = @pass
+RETURN 
+
+CREATE PROCEDURE spUzivatelUloz
+(
+  @id Int,
+  @jmeno NVarChar(255),
+  @prijmeni NVarChar(255),
+  @ulice NVarChar(255),
+  @email NVarChar(255),
+  @msn Bit,
+  @telefon NVarChar(13),
+  @icq NVarChar(15),
+  @login NVarChar(20),
+  @heslo NVarChar(30)
+)
+AS
+SET NOCOUNT ON
+IF (@id &gt; 0) BEGIN
+UPDATE
+  Uzivatel
+SET
+  jmeno = @jmeno,
+  prijmeni = @prijmeni,
+  ulice = @ulice,
+  email = @email,
+  msn = @msn,
+  telefon = @telefon,
+  icq = @icq,
+  login = @login,
+  password = @heslo
+WHERE
+  id_uzivatele = @id
+END ELSE BEGIN
+INSERT INTO Uzivatel
+(
+  jmeno,
+  prijmeni,
+  ulice,
+  email,
+  msn,
+  telefon,
+  icq,
+  login,
+  password
+)
+VALUES
+(
+  @jmeno,
+  @prijmeni,
+  @ulice,
+  @email,
+  @msn,
+  @telefon,
+  @icq,
+  @login,
+  @heslo
+)
+SELECT Cast(@@IDENTITY AS Int)  
+END 
+RETURN 
+
+CREATE PROCEDURE spZakaznikNacti
+(
+  @id Int,
+  @firma NVarChar(255) Output,
+  @ic NVarChar(30) Output,
+  @dic NVarChar(30) Output,
+  @banka NVarChar(100) Output
+)
+AS
+SELECT
+  @firma = firma,
+  @ic = ic,
+  @dic = dic,
+  @banka = bankovni_spojeni
+FROM
+  Zakaznik
+WHERE     
+  @id = id_uzivatele
+RETURN 
+
+CREATE PROCEDURE spZakaznikNactiModul
+AS
+SELECT
+  Zakaznik.id_uzivatele,
+  jmeno + ' ' + prijmeni AS zastupce,
+  firma,
+  telefon
+FROM
+  Zakaznik INNER JOIN Uzivatel ON (Zakaznik.id_uzivatele = Uzivatel.id_uzivatele)
+RETURN
+
+CREATE PROCEDURE spZakaznikNactiVyber
+AS
+SELECT
+  id_uzivatele,
+  firma
+FROM
+  Zakaznik
+RETURN 
+
+CREATE PROCEDURE spZakaznikUloz
+(
+  @id int,
+  @firma NVarChar(255),
+  @ic NVarChar(30),
+  @dic NVarChar(30),
+  @banka NVarChar(100)
+)
+AS
+SET NOCOUNT ON
+IF EXISTS(SELECT * FROM Zakaznik WHERE id_uzivatele = @id) BEGIN
+UPDATE Zakaznik
+SET
+  firma = @firma,
+  ic = @ic,
+  dic = @dic,
+  bankovni_spojeni = @banka
+WHERE
+  id_uzivatele = @id 
+END ELSE BEGIN
+INSERT INTO Zakaznik
+(
+  firma,
+  ic,
+  dic,
+  bankovni_spojeni,
+  id_uzivatele
+)
+VALUES
+(
+  @firma,
+  @ic,
+  @dic,
+  @banka,
+  @id
+)
+END
+RETURN</pre>
+<p class="copyright">Vypracoval Aleš Roubíček vrámci semestrální práce z předmětu <a href="http://service.felk.cvut.cz/courses/36DBS/" title="stránka předmětu">X36DBS</a>.</p>
+</body>
+</html>

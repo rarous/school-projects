@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Language" content="cs" />
+<meta name="author" content="Aleš Roubíček; mailto:ales.roubicek@pbsoftware.cz" />
+<link href="../../Themes/sheets.css" rel="stylesheet" type="text/css" />
+<title>X36WWW - Semestrální práce - Program Projektor - Programátorský manuál</title>
+</head>
+<body>
+<h1>Program Projektor - Programátorský manuál</h1>
+	<p>Program Projektor je webová aplikace založená na technoligii ASP.NET 2 a na databázovém
+		stroji MS SQL Server 2005. Aplikace je rozložená do tří vrstev:</p>
+	<ol>
+		<li>Vrstva databázová. Přímo uchovává a zpracovává data vkládaná uživateli. Zpracování
+			dat probíhá pomocí parametrizovaných uložených procedur, které zvyšují výkon aplikace,
+			jelikož dochází k jejich kompilaci na SQL serveru. <a href="db.htm">Více o databázové
+				vrstvě</a>.</li>
+		<li>Vrstva aplikační logiky. Tato vrstva přistupuje k databázi, jedná se o kompilovanou
+			sadu tříd s metodami potřebnými pro chod celé aplikace. Tyto třídy volají uložené
+			procedury na serveru. Díky spolupráci ASP.NET 2 a MS SQL Serveru 2005 dochází opět
+			k výkonostnímu nárůstu. Tato vrstva se může použít jak pro webformy, tak pro webové
+			služby.</li>
+		<li>Prezentační vrstva. Tato vrstva má na starosti prezentaci dat a zajišťuje rozhranní
+			pro editaci dat. Tato vrstva plně využívá nových vlastností ASP.NET 2. Všechny stránky
+			mají jednotný vzhled díky Master Page, ze které jsou generovány, kód jednotlivých
+			stránek je opět kompilovaný. Prezentační vrstva je realizována v jazyce XHTML 1.1
+			a ostylována pomocí CSS 2.1. Dále se snaží vnést prvky přístupnosti a použitelnosti.</li>
+	</ol>
+	<h2>Aplikační model</h2>
+	<p>Dá se říct, že každý entitní typ má svojí vlastní třídu, která zajišťuje přístup
+		do databáze a základní operace s tímto typem. Všechny třídy, které přistupují do
+		datbáze, implementují rozhranní IDbAccess, které je součístí knihovny PBSoftware.Utility.dll.
+		Více viz. <a href="ProjektorDoc.chm">dokumentace</a>.</p>
+</body>
+</html>
